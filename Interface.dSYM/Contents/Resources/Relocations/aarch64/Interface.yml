@@ -1,0 +1,9 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/sadmiriad/Desktop/VS CODE/Projet Interface Algo/Interface'
+relocations:
+  - { offsetInCU: 0xD7, offset: 0xD7, size: 0x8, addend: 0x0, symName: _on_button_clicked, symObjAddr: 0x0, symBinAddr: 0x100003D64, symSize: 0x28 }
+  - { offsetInCU: 0x1F3, offset: 0x1F3, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x28, symBinAddr: 0x100003D8C, symSize: 0x104 }
+  - { offsetInCU: 0x25B, offset: 0x25B, size: 0x8, addend: 0x0, symName: _on_button_clicked, symObjAddr: 0x0, symBinAddr: 0x100003D64, symSize: 0x28 }
+  - { offsetInCU: 0x263, offset: 0x263, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x28, symBinAddr: 0x100003D8C, symSize: 0x104 }
+...

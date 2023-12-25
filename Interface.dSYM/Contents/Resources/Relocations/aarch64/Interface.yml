@@ -2,8 +2,14 @@
 triple:          'arm64-apple-darwin'
 binary-path:     '/Users/sadmiriad/Desktop/VS CODE/Projet Interface Algo/Interface'
 relocations:
-  - { offsetInCU: 0xD7, offset: 0xD7, size: 0x8, addend: 0x0, symName: _on_button_clicked, symObjAddr: 0x0, symBinAddr: 0x100003D64, symSize: 0x28 }
-  - { offsetInCU: 0x1F3, offset: 0x1F3, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x28, symBinAddr: 0x100003D8C, symSize: 0x104 }
-  - { offsetInCU: 0x25B, offset: 0x25B, size: 0x8, addend: 0x0, symName: _on_button_clicked, symObjAddr: 0x0, symBinAddr: 0x100003D64, symSize: 0x28 }
-  - { offsetInCU: 0x263, offset: 0x263, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x28, symBinAddr: 0x100003D8C, symSize: 0x104 }
+  - { offsetInCU: 0xD7, offset: 0xD7, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x1000034B0, symSize: 0x224 }
+  - { offsetInCU: 0x4CB, offset: 0x4CB, size: 0x8, addend: 0x0, symName: _window, symObjAddr: 0x5900, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x4E0, offset: 0x4E0, size: 0x8, addend: 0x0, symName: _vbox, symObjAddr: 0x5908, symBinAddr: 0x100008008, symSize: 0x0 }
+  - { offsetInCU: 0x4F6, offset: 0x4F6, size: 0x8, addend: 0x0, symName: _taille, symObjAddr: 0x5910, symBinAddr: 0x100008010, symSize: 0x0 }
+  - { offsetInCU: 0x51D, offset: 0x51D, size: 0x8, addend: 0x0, symName: _tableau, symObjAddr: 0x5914, symBinAddr: 0x100008014, symSize: 0x0 }
+  - { offsetInCU: 0x537, offset: 0x537, size: 0x8, addend: 0x0, symName: _afficherTableau, symObjAddr: 0x408, symBinAddr: 0x1000038B8, symSize: 0x2F0 }
+  - { offsetInCU: 0x663, offset: 0x663, size: 0x8, addend: 0x0, symName: _remplirTableau, symObjAddr: 0x224, symBinAddr: 0x1000036D4, symSize: 0x1E4 }
+  - { offsetInCU: 0x66B, offset: 0x66B, size: 0x8, addend: 0x0, symName: _afficherTableau, symObjAddr: 0x408, symBinAddr: 0x1000038B8, symSize: 0x2F0 }
+  - { offsetInCU: 0x76A, offset: 0x76A, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x1000034B0, symSize: 0x224 }
+  - { offsetInCU: 0x772, offset: 0x772, size: 0x8, addend: 0x0, symName: _remplirTableau, symObjAddr: 0x224, symBinAddr: 0x1000036D4, symSize: 0x1E4 }
 ...

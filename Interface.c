@@ -2,11 +2,13 @@
 #include <pango/pango.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+// declaration globale psq utilisithm un peu partout dans le code
 GtkWidget *window;
 GtkWidget *vbox;
+GtkWidget *grid;
 int taille = 0;
 int tableau[100];
+int currentCase=0;
 
 //en cours de traitement psq nzid el button sup 
 // typedef struct {
@@ -14,12 +16,11 @@ int tableau[100];
 //     GtkWidget *label;
 // } ElementData;
 
-
+// hadi bch yaffichiw gae les cases fiha appel lel fonction li rahi ththa
 void afficherTableau();
-
-
-
-
+// fonction li tcreeyi grille case par case
+void afficherCase();
+//donner main a l'utilisateurs pour faire en sorte howa y3mr b les valeurs li raw habhm plus la taille du tableau
 void remplirTableau();
 
 
@@ -60,23 +61,16 @@ int main(int argc, char *argv[])
 void remplirTableau(GtkWidget *widget, gpointer data) {
     GtkWidget *entry = GTK_WIDGET(data);
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
-    int taille = atoi(text);
-    //ida kanet la taille negatif
+    taille = atoi(text);
+
     if (taille <= 0) {
         printf("Erreur: la taille du tableau doit être un entier strictement positif.\n");
-        return; 
-    }
-    //erreur l'allocation
-    int *monTableau = (int *)malloc(taille * sizeof(int));
-    if (monTableau == NULL) {
-        printf("Erreur: échec de l'allocation de mémoire pour le tableau.\n");
-        return; 
+        return;
     }
 
-    // donner main a l'utilisateur pour tapez 
     for (int i = 0; i < taille; ++i) {
         GtkWidget *dialog;
-        dialog = gtk_dialog_new_with_buttons("Saisie de valeur",GTK_WINDOW(window),GTK_DIALOG_MODAL,"_OK", GTK_RESPONSE_OK,"_Cancel", GTK_RESPONSE_CANCEL,NULL);
+        dialog = gtk_dialog_new_with_buttons("Saisie de valeur", GTK_WINDOW(window), GTK_DIALOG_MODAL, "_OK", GTK_RESPONSE_OK, "_Cancel", GTK_RESPONSE_CANCEL, NULL);
 
         GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
@@ -88,22 +82,56 @@ void remplirTableau(GtkWidget *widget, gpointer data) {
 
         if (result == GTK_RESPONSE_OK) {
             const char *textValue = gtk_entry_get_text(GTK_ENTRY(entryValue));
-            sscanf(textValue, "%d", &monTableau[i]);
+            sscanf(textValue, "%d", &tableau[i]);
         }
 
         gtk_widget_destroy(dialog);
     }
 
-    //N3ytlo lel fonction affichag
-    afficherTableau(monTableau, taille);
-
-    // nlibiri el mémoire
-    free(monTableau);
+    afficherTableau(tableau, taille);
 }
+
+void afficherCase()
+{
+if (currentCase < taille) {
+        char label_text[50];
+        snprintf(label_text, sizeof(label_text), "%d", tableau[currentCase]);
+
+        GtkWidget *label = gtk_label_new(label_text);
+        PangoAttrList *attr_list = pango_attr_list_new();
+        PangoAttribute *attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+        pango_attr_list_insert(attr_list, attr);
+        gtk_label_set_attributes(GTK_LABEL(label), attr_list);
+        pango_attr_list_unref(attr_list);
+
+        GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+        gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
+
+        int cell_size = 50;
+        gtk_widget_set_size_request(box, cell_size, cell_size);
+
+        GtkWidget *frame = gtk_frame_new(NULL);
+        gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+        gtk_container_add(GTK_CONTAINER(frame), box);
+
+        gtk_grid_attach(GTK_GRID(grid), frame, currentCase % 5, currentCase / 5, 1, 1);
+
+        GdkRGBA red;
+        gdk_rgba_parse(&red, "#FFDDDD");
+        gtk_widget_override_background_color(box, GTK_STATE_FLAG_NORMAL, &red);
+
+        gtk_widget_show_all(window);
+
+        
+        currentCase++;
+
+        //n3yt lel la meme fonction avec un delai 
+        g_timeout_add(1250, (GSourceFunc)afficherCase, NULL);
+    }
+}
+
 void afficherTableau(const int *tableau, int taille) {
-    //nehiiii klch wch kan fel fenetre el 9dima
-    GList *children, *iter;
-    GtkWidget *grid;
+   GList *children, *iter;
 
     children = gtk_container_get_children(GTK_CONTAINER(vbox));
 
@@ -113,53 +141,17 @@ void afficherTableau(const int *tableau, int taille) {
 
     g_list_free(children);
 
-    // bch nkhdm les cases de tableau en horizental
     grid = gtk_grid_new();
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);  
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 1);  //bch yjo las9in binathm
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 1);
 
-    // bch yjo carre
-    int cell_size = 50;  
+    // nrj3ha men debut
+    currentCase = 0;
 
-    // nkhdm les cases w nzid les valeurs li tapinahm
-    for (int i = 0; i < taille; ++i) {
-        char label_text[50];
-        snprintf(label_text, sizeof(label_text), "%d", tableau[i]);
+    // dok n3yt lel fonction bch taffichili case par case
+    afficherCase();
 
-        GtkWidget *label = gtk_label_new(label_text);
-        PangoAttrList *attr_list = pango_attr_list_new();
-        PangoAttribute *attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
-        pango_attr_list_insert(attr_list, attr);
-        gtk_label_set_attributes(GTK_LABEL(label), attr_list);
-        pango_attr_list_unref(attr_list);
-
-        // nkhdm boite lel label
-        GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-        gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
-
-        // ndir taille min
-        gtk_widget_set_size_request(box, cell_size, cell_size);
-
-        // cadrage de 2px 
-        GtkWidget *frame = gtk_frame_new(NULL);
-        gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-        gtk_container_add(GTK_CONTAINER(frame), box);
-
-        // ndir el label lel grille
-        gtk_grid_attach(GTK_GRID(grid), frame, i % 5, i / 5, 1, 1);
-
-        // background color 
-        GdkRGBA red;
-        gdk_rgba_parse(&red, "#FFDDDD");  // Vous pouvez ajuster la teinte de rouge selon vos préférences
-        gtk_widget_override_background_color(box, GTK_STATE_FLAG_NORMAL, &red);
-
-        // affichage du label 
-        gtk_widget_show(label);
-    }
-
-    // appendchild el new div 
     gtk_container_add(GTK_CONTAINER(vbox), grid);
 
-    // rafrichir la case
     gtk_widget_show_all(window);
 }

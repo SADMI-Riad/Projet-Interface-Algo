@@ -3,27 +3,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 // declaration globale psq utilisithm un peu partout dans le code
+#define MAX_TAILLE 200
+
+
 GtkWidget *window;
 GtkWidget *vbox;
 GtkWidget *grid;
+GtkWidget *labelStatus;
+GtkCssProvider *provider; // bch n9dr nst3ml css
 int taille = 0;
-int tableau[100];
+int tableau[MAX_TAILLE];
 int currentCase=0;
 
-//en cours de traitement psq nzid el button sup 
-// typedef struct {
-//     int valeur;
-//     GtkWidget *label;
-// } ElementData;
-
+//fonction li tajouti la valeur
+void ajoutervaleur(GtkWidget *widget , gpointer data);
 // hadi bch yaffichiw gae les cases fiha appel lel fonction li rahi ththa
-void afficherTableau();
+void afficherTableau(const int *tableau , int taille);
 // fonction li tcreeyi grille case par case
 void afficherCase();
 //donner main a l'utilisateurs pour faire en sorte howa y3mr b les valeurs li raw habhm plus la taille du tableau
-void remplirTableau();
-
-
+void remplirTableau(GtkWidget *widget , gpointer data);
+// en cour de traitement et modification
+GtkWidget * creer_label_anime(const char *text);
+// function poour apply css
+void application_css(GtkWidget *widget,GtkStyleProvider *provider);
 
 
 
@@ -33,11 +36,11 @@ int main(int argc, char *argv[])
     gtk_init(&argc, &argv);
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Tableau GTK");
-    gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
-    gtk_container_set_border_width(GTK_CONTAINER(window), 10);
+    gtk_window_set_title(GTK_WINDOW(window), "Simulation Tri par Insertion tableau");
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+    gtk_container_set_border_width(GTK_CONTAINER(window), 15);
 
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     GtkWidget *label = gtk_label_new("Saisir la taille du tableau :");
@@ -48,8 +51,19 @@ int main(int argc, char *argv[])
     GtkWidget *buttonRemplir = gtk_button_new_with_label("Remplir le tableau");
     g_signal_connect(G_OBJECT(buttonRemplir), "clicked", G_CALLBACK(remplirTableau), entry);
     gtk_container_add(GTK_CONTAINER(vbox), buttonRemplir);
+    //nzid btn quitter
+    GtkWidget *quitBtn = gtk_button_new_with_label("Quitter");
+    gtk_container_add(GTK_CONTAINER(vbox), quitBtn);  
+    g_signal_connect(G_OBJECT(quitBtn), "clicked", G_CALLBACK(gtk_main_quit), NULL);
+    labelStatus = gtk_label_new("");
+    gtk_container_add(GTK_CONTAINER(vbox), labelStatus);
 
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider,
+        "window { background-color: #EEE; }"  
+        "button, .button { border-radius: 8px; padding: 10px; background: #AED581; color: #FFF; }"
+        "button:hover, .button:hover { background: #81C784; cursor:pointer;}", -1, NULL);
+    application_css(GTK_WIDGET(window), GTK_STYLE_PROVIDER(provider)); 
 
     gtk_widget_show_all(window);
 
@@ -63,14 +77,14 @@ void remplirTableau(GtkWidget *widget, gpointer data) {
     const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
     taille = atoi(text);
 
-    if (taille <= 0) {
+    if (taille <= 0 || taille> MAX_TAILLE) {
         printf("Erreur: la taille du tableau doit être un entier strictement positif.\n");
         return;
     }
 
     for (int i = 0; i < taille; ++i) {
         GtkWidget *dialog;
-        dialog = gtk_dialog_new_with_buttons("Saisie de valeur", GTK_WINDOW(window), GTK_DIALOG_MODAL, "_OK", GTK_RESPONSE_OK, "_Cancel", GTK_RESPONSE_CANCEL, NULL);
+        dialog = gtk_dialog_new_with_buttons("Saisie de valeur", GTK_WINDOW(window), GTK_DIALOG_MODAL, "_OK", GTK_RESPONSE_OK, "_Retour", GTK_RESPONSE_CANCEL, NULL);
 
         GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
@@ -97,28 +111,20 @@ if (currentCase < taille) {
         char label_text[50];
         snprintf(label_text, sizeof(label_text), "%d", tableau[currentCase]);
 
-        GtkWidget *label = gtk_label_new(label_text);
-        PangoAttrList *attr_list = pango_attr_list_new();
-        PangoAttribute *attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
-        pango_attr_list_insert(attr_list, attr);
-        gtk_label_set_attributes(GTK_LABEL(label), attr_list);
-        pango_attr_list_unref(attr_list);
-
+        GtkWidget *label = creer_label_anime(label_text);
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
         gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
-
         int cell_size = 50;
         gtk_widget_set_size_request(box, cell_size, cell_size);
 
         GtkWidget *frame = gtk_frame_new(NULL);
-        gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+        gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
         gtk_container_add(GTK_CONTAINER(frame), box);
-
         gtk_grid_attach(GTK_GRID(grid), frame, currentCase % 5, currentCase / 5, 1, 1);
 
-        GdkRGBA red;
-        gdk_rgba_parse(&red, "#FFDDDD");
-        gtk_widget_override_background_color(box, GTK_STATE_FLAG_NORMAL, &red);
+        GdkRGBA color;
+        gdk_rgba_parse(&color, "#81C784");
+        gtk_widget_override_background_color(box, GTK_STATE_FLAG_NORMAL, &color);
 
         gtk_widget_show_all(window);
 
@@ -144,14 +150,89 @@ void afficherTableau(const int *tableau, int taille) {
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 1);
+    gtk_container_add(GTK_CONTAINER(vbox),grid);
 
     // nrj3ha men debut
     currentCase = 0;
 
     // dok n3yt lel fonction bch taffichili case par case
     afficherCase();
-
-    gtk_container_add(GTK_CONTAINER(vbox), grid);
+    //nnzid le button tae ajouter valeur w nconnectih mea el fonction 
+    GtkWidget *addbtn= gtk_button_new_with_label("Ajouter une valeur au Tableau");
+    g_signal_connect(G_OBJECT(addbtn), "clicked", G_CALLBACK(ajoutervaleur), NULL);
+    gtk_container_add(GTK_CONTAINER(vbox),addbtn);
+    //nzid btn quitte hna tan 
+    GtkWidget *quitBtn = gtk_button_new_with_label("Quitter");
+    gtk_container_add(GTK_CONTAINER(vbox), quitBtn);  
+    g_signal_connect(G_OBJECT(quitBtn), "clicked", G_CALLBACK(gtk_main_quit), NULL);
+    //css the btn
+    provider=gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider,
+    "window { background-color: #EEE; }"  
+    "button, .button { border-radius: 8px; padding: 10px; background: #AED581; color: #FFF; }"
+    "button:hover, .button:hover { background: #81C784; cursor:pointer;}", -1, NULL);
+    
+    application_css(GTK_WIDGET(window), GTK_STYLE_PROVIDER(provider)); 
 
     gtk_widget_show_all(window);
+}
+GtkWidget * creer_label_anime(const char *text)
+{
+     GtkWidget *label = gtk_label_new(text);
+     PangoAttrList * attr_list= pango_attr_list_new();
+     PangoAttribute *attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+     
+
+     pango_attr_list_insert(attr_list,attr);
+     gtk_label_set_attributes(GTK_LABEL(label), attr_list);
+     pango_attr_list_unref(attr_list);
+
+     return label;
+}
+
+
+void application_css(GtkWidget *widget, GtkStyleProvider *provider) {
+    gtk_style_context_add_provider(gtk_widget_get_style_context(widget), provider, G_MAXUINT);
+    if (GTK_IS_CONTAINER(widget)) {
+        gtk_container_forall(GTK_CONTAINER(widget), (GtkCallback)application_css, provider);
+    }
+}
+
+void ajoutervaleur(GtkWidget *widget , gpointer data)
+{
+    if (taille >= MAX_TAILLE)
+    {
+        gtk_label_set_text(GTK_LABEL(labelStatus),"Le tableau est plein!");
+        return;
+    }
+GtkWidget *dialog,*valeurEntry,*positionEntry,*content_area;
+dialog=gtk_dialog_new_with_buttons("Ajouter une valeur",GTK_WINDOW(window),GTK_DIALOG_MODAL,"_OK",GTK_RESPONSE_OK,"_Retour",GTK_RESPONSE_CANCEL,NULL);
+content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    valeurEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(valeurEntry), "Valeur à ajouter");
+    gtk_container_add(GTK_CONTAINER(content_area), valeurEntry);
+    positionEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(positionEntry), "Position (0-indexé)");
+    gtk_container_add(GTK_CONTAINER(content_area), positionEntry);
+    gtk_widget_show_all(dialog);
+    gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+    if (result == GTK_RESPONSE_OK) {
+        const char *valeurText = gtk_entry_get_text(GTK_ENTRY(valeurEntry));
+        const char *positionText = gtk_entry_get_text(GTK_ENTRY(positionEntry));
+        int valeur = atoi(valeurText);
+        int position = atoi(positionText);
+        if (position < 0 || position > taille) {
+            gtk_label_set_text(GTK_LABEL(labelStatus), "Position invalide!");
+        } else {
+            for (int i = taille; i > position; --i) {
+                tableau[i] = tableau[i - 1];
+            }
+            tableau[position] = valeur;
+            taille++;
+            currentCase = 0;
+            afficherTableau(tableau, taille);
+        }
+    }
+    gtk_widget_destroy(dialog);
+    
 }

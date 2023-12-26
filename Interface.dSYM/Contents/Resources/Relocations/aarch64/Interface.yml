@@ -2,18 +2,26 @@
 triple:          'arm64-apple-darwin'
 binary-path:     '/Users/sadmiriad/Desktop/VS CODE/Projet Interface Algo/Interface'
 relocations:
-  - { offsetInCU: 0xD7, offset: 0xD7, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x10000340C, symSize: 0x224 }
-  - { offsetInCU: 0x4C5, offset: 0x4C5, size: 0x8, addend: 0x0, symName: _window, symObjAddr: 0x59D8, symBinAddr: 0x100008000, symSize: 0x0 }
-  - { offsetInCU: 0x4DA, offset: 0x4DA, size: 0x8, addend: 0x0, symName: _vbox, symObjAddr: 0x59E0, symBinAddr: 0x100008008, symSize: 0x0 }
-  - { offsetInCU: 0x4F1, offset: 0x4F1, size: 0x8, addend: 0x0, symName: _grid, symObjAddr: 0x59E8, symBinAddr: 0x100008010, symSize: 0x0 }
-  - { offsetInCU: 0x50A, offset: 0x50A, size: 0x8, addend: 0x0, symName: _taille, symObjAddr: 0x59F0, symBinAddr: 0x100008018, symSize: 0x0 }
-  - { offsetInCU: 0x52E, offset: 0x52E, size: 0x8, addend: 0x0, symName: _tableau, symObjAddr: 0x59F4, symBinAddr: 0x10000801C, symSize: 0x0 }
-  - { offsetInCU: 0x549, offset: 0x549, size: 0x8, addend: 0x0, symName: _currentCase, symObjAddr: 0x5B84, symBinAddr: 0x1000081AC, symSize: 0x0 }
-  - { offsetInCU: 0x55F, offset: 0x55F, size: 0x8, addend: 0x0, symName: _afficherTableau, symObjAddr: 0x658, symBinAddr: 0x100003A64, symSize: 0x158 }
-  - { offsetInCU: 0x5BC, offset: 0x5BC, size: 0x8, addend: 0x0, symName: _afficherCase, symObjAddr: 0x404, symBinAddr: 0x100003810, symSize: 0x254 }
-  - { offsetInCU: 0x5C4, offset: 0x5C4, size: 0x8, addend: 0x0, symName: _afficherTableau, symObjAddr: 0x658, symBinAddr: 0x100003A64, symSize: 0x158 }
-  - { offsetInCU: 0x675, offset: 0x675, size: 0x8, addend: 0x0, symName: _remplirTableau, symObjAddr: 0x224, symBinAddr: 0x100003630, symSize: 0x1E0 }
-  - { offsetInCU: 0x67D, offset: 0x67D, size: 0x8, addend: 0x0, symName: _afficherCase, symObjAddr: 0x404, symBinAddr: 0x100003810, symSize: 0x254 }
-  - { offsetInCU: 0x75C, offset: 0x75C, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x10000340C, symSize: 0x224 }
-  - { offsetInCU: 0x764, offset: 0x764, size: 0x8, addend: 0x0, symName: _remplirTableau, symObjAddr: 0x224, symBinAddr: 0x100003630, symSize: 0x1E0 }
+  - { offsetInCU: 0xD7, offset: 0xD7, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100002B38, symSize: 0x330 }
+  - { offsetInCU: 0x541, offset: 0x541, size: 0x8, addend: 0x0, symName: _window, symObjAddr: 0x6EB0, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x556, offset: 0x556, size: 0x8, addend: 0x0, symName: _vbox, symObjAddr: 0x6EB8, symBinAddr: 0x100008008, symSize: 0x0 }
+  - { offsetInCU: 0x56D, offset: 0x56D, size: 0x8, addend: 0x0, symName: _grid, symObjAddr: 0x6EC0, symBinAddr: 0x100008010, symSize: 0x0 }
+  - { offsetInCU: 0x58B, offset: 0x58B, size: 0x8, addend: 0x0, symName: _labelStatus, symObjAddr: 0x6EC8, symBinAddr: 0x100008018, symSize: 0x0 }
+  - { offsetInCU: 0x59A, offset: 0x59A, size: 0x8, addend: 0x0, symName: _provider, symObjAddr: 0x6ED0, symBinAddr: 0x100008020, symSize: 0x0 }
+  - { offsetInCU: 0x5B4, offset: 0x5B4, size: 0x8, addend: 0x0, symName: _taille, symObjAddr: 0x6ED8, symBinAddr: 0x100008028, symSize: 0x0 }
+  - { offsetInCU: 0x5D8, offset: 0x5D8, size: 0x8, addend: 0x0, symName: _tableau, symObjAddr: 0x6EDC, symBinAddr: 0x10000802C, symSize: 0x0 }
+  - { offsetInCU: 0x5F3, offset: 0x5F3, size: 0x8, addend: 0x0, symName: _currentCase, symObjAddr: 0x71FC, symBinAddr: 0x10000834C, symSize: 0x0 }
+  - { offsetInCU: 0x607, offset: 0x607, size: 0x8, addend: 0x0, symName: _ajoutervaleur, symObjAddr: 0xB10, symBinAddr: 0x100003648, symSize: 0x2F0 }
+  - { offsetInCU: 0x704, offset: 0x704, size: 0x8, addend: 0x0, symName: _application_css, symObjAddr: 0xA44, symBinAddr: 0x10000357C, symSize: 0xCC }
+  - { offsetInCU: 0x70C, offset: 0x70C, size: 0x8, addend: 0x0, symName: _ajoutervaleur, symObjAddr: 0xB10, symBinAddr: 0x100003648, symSize: 0x2F0 }
+  - { offsetInCU: 0x786, offset: 0x786, size: 0x8, addend: 0x0, symName: _creer_label_anime, symObjAddr: 0x9E0, symBinAddr: 0x100003518, symSize: 0x64 }
+  - { offsetInCU: 0x78E, offset: 0x78E, size: 0x8, addend: 0x0, symName: _application_css, symObjAddr: 0xA44, symBinAddr: 0x10000357C, symSize: 0xCC }
+  - { offsetInCU: 0x7DF, offset: 0x7DF, size: 0x8, addend: 0x0, symName: _afficherTableau, symObjAddr: 0x738, symBinAddr: 0x100003270, symSize: 0x2A8 }
+  - { offsetInCU: 0x7E7, offset: 0x7E7, size: 0x8, addend: 0x0, symName: _creer_label_anime, symObjAddr: 0x9E0, symBinAddr: 0x100003518, symSize: 0x64 }
+  - { offsetInCU: 0x85A, offset: 0x85A, size: 0x8, addend: 0x0, symName: _afficherCase, symObjAddr: 0x524, symBinAddr: 0x10000305C, symSize: 0x214 }
+  - { offsetInCU: 0x862, offset: 0x862, size: 0x8, addend: 0x0, symName: _afficherTableau, symObjAddr: 0x738, symBinAddr: 0x100003270, symSize: 0x2A8 }
+  - { offsetInCU: 0x8F5, offset: 0x8F5, size: 0x8, addend: 0x0, symName: _remplirTableau, symObjAddr: 0x330, symBinAddr: 0x100002E68, symSize: 0x1F4 }
+  - { offsetInCU: 0x8FD, offset: 0x8FD, size: 0x8, addend: 0x0, symName: _afficherCase, symObjAddr: 0x524, symBinAddr: 0x10000305C, symSize: 0x214 }
+  - { offsetInCU: 0x9DC, offset: 0x9DC, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100002B38, symSize: 0x330 }
+  - { offsetInCU: 0x9E4, offset: 0x9E4, size: 0x8, addend: 0x0, symName: _remplirTableau, symObjAddr: 0x330, symBinAddr: 0x100002E68, symSize: 0x1F4 }
 ...

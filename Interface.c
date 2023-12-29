@@ -14,6 +14,7 @@ GtkCssProvider *provider; // bch n9dr nst3ml css
 int taille = 0;
 int tableau[MAX_TAILLE];
 int currentCase=0;
+// GtkWidget **arrayLabels = NULL;
 
 //fonction li tajouti la valeur
 void ajoutervaleur(GtkWidget *widget , gpointer data);
@@ -27,7 +28,14 @@ void remplirTableau(GtkWidget *widget , gpointer data);
 GtkWidget * creer_label_anime(const char *text);
 // function poour apply css
 void application_css(GtkWidget *widget,GtkStyleProvider *provider);
+// bch n'ameliori encore plus
+gboolean transitionColor(gpointer box_ptr);
+gboolean fadeInLabel(gpointer label_ptr);
 
+void recommencerApplication(GtkWidget *widget, gpointer data);
+
+//nsgm el bug de compilation
+static gboolean draw_background(GtkWidget *widget, cairo_t *cr, gpointer data);
 
 
 int main(int argc, char *argv[])
@@ -37,7 +45,7 @@ int main(int argc, char *argv[])
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Simulation Tri par Insertion tableau");
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+    gtk_window_set_default_size(GTK_WINDOW(window), 700, 500);
     gtk_container_set_border_width(GTK_CONTAINER(window), 15);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -107,32 +115,36 @@ void remplirTableau(GtkWidget *widget, gpointer data) {
 
 void afficherCase()
 {
-if (currentCase < taille) {
+if (currentCase < taille ) {
         char label_text[50];
         snprintf(label_text, sizeof(label_text), "%d", tableau[currentCase]);
-
         GtkWidget *label = creer_label_anime(label_text);
+        //animation
+        gtk_widget_set_opacity(label, 0.0);
+        g_timeout_add(100, fadeInLabel, label);
+        g_timeout_add(50, transitionColor, label);
+
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
         gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
-        int cell_size = 50;
+        g_signal_connect(G_OBJECT(box), "draw", G_CALLBACK(draw_background), NULL);
+
+        int cell_size = 60;
         gtk_widget_set_size_request(box, cell_size, cell_size);
 
         GtkWidget *frame = gtk_frame_new(NULL);
         gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
         gtk_container_add(GTK_CONTAINER(frame), box);
+        g_signal_connect(G_OBJECT(frame), "draw", G_CALLBACK(draw_background), NULL);
         gtk_grid_attach(GTK_GRID(grid), frame, currentCase % 5, currentCase / 5, 1, 1);
-
-        GdkRGBA color;
-        gdk_rgba_parse(&color, "#81C784");
-        gtk_widget_override_background_color(box, GTK_STATE_FLAG_NORMAL, &color);
 
         gtk_widget_show_all(window);
 
         
         currentCase++;
 
+        if (currentCase < taille) {
         //n3yt lel la meme fonction avec un delai 
-        g_timeout_add(1250, (GSourceFunc)afficherCase, NULL);
+        g_timeout_add(1500, (GSourceFunc)afficherCase, NULL);}
     }
 }
 
@@ -148,23 +160,34 @@ void afficherTableau(const int *tableau, int taille) {
     g_list_free(children);
 
     grid = gtk_grid_new();
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 10);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 1);
+    gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
     gtk_container_add(GTK_CONTAINER(vbox),grid);
 
     // nrj3ha men debut
     currentCase = 0;
 
+
+    //create the div btn
+    GtkWidget *buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_box_set_homogeneous(GTK_BOX(buttonBox), TRUE); 
     // dok n3yt lel fonction bch taffichili case par case
     afficherCase();
     //nnzid le button tae ajouter valeur w nconnectih mea el fonction 
     GtkWidget *addbtn= gtk_button_new_with_label("Ajouter une valeur au Tableau");
     g_signal_connect(G_OBJECT(addbtn), "clicked", G_CALLBACK(ajoutervaleur), NULL);
-    gtk_container_add(GTK_CONTAINER(vbox),addbtn);
+    gtk_container_add(GTK_CONTAINER(buttonBox),addbtn);
     //nzid btn quitte hna tan 
     GtkWidget *quitBtn = gtk_button_new_with_label("Quitter");
-    gtk_container_add(GTK_CONTAINER(vbox), quitBtn);  
+    gtk_container_add(GTK_CONTAINER(buttonBox), quitBtn);  
     g_signal_connect(G_OBJECT(quitBtn), "clicked", G_CALLBACK(gtk_main_quit), NULL);
+    //restart btn
+    GtkWidget *buttonRecommencer = gtk_button_new_with_label("Recommencer");
+    g_signal_connect(G_OBJECT(buttonRecommencer), "clicked", G_CALLBACK(recommencerApplication), NULL);
+    gtk_box_pack_start(GTK_BOX(buttonBox), buttonRecommencer, TRUE, TRUE, 0);
+
     //css the btn
     provider=gtk_css_provider_new();
     gtk_css_provider_load_from_data(provider,
@@ -172,22 +195,17 @@ void afficherTableau(const int *tableau, int taille) {
     "button, .button { border-radius: 8px; padding: 10px; background: #AED581; color: #FFF; }"
     "button:hover, .button:hover { background: #81C784; cursor:pointer;}", -1, NULL);
     
-    application_css(GTK_WIDGET(window), GTK_STYLE_PROVIDER(provider)); 
+    application_css(GTK_WIDGET(buttonBox), GTK_STYLE_PROVIDER(provider)); 
 
+    gtk_box_pack_end(GTK_BOX(vbox), buttonBox, FALSE, FALSE, 0);
     gtk_widget_show_all(window);
 }
+
 GtkWidget * creer_label_anime(const char *text)
 {
-     GtkWidget *label = gtk_label_new(text);
-     PangoAttrList * attr_list= pango_attr_list_new();
-     PangoAttribute *attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
-     
-
-     pango_attr_list_insert(attr_list,attr);
-     gtk_label_set_attributes(GTK_LABEL(label), attr_list);
-     pango_attr_list_unref(attr_list);
-
-     return label;
+    GtkWidget *label = gtk_label_new(text);
+    g_signal_connect(G_OBJECT(label), "draw", G_CALLBACK(draw_background), NULL);
+    return label;
 }
 
 
@@ -235,4 +253,118 @@ content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     }
     gtk_widget_destroy(dialog);
     
+}
+static gboolean draw_background(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    GdkRGBA *color = g_object_get_data(G_OBJECT(widget), "custom-bg-color");
+    if (color) {
+        gdk_cairo_set_source_rgba(cr, color);
+    } else {
+        GdkRGBA default_color;
+        gdk_rgba_parse(&default_color, "#AED581"); 
+        gdk_cairo_set_source_rgba(cr, &default_color);
+    }
+
+    cairo_rectangle(cr, 0, 0, gtk_widget_get_allocated_width(widget), gtk_widget_get_allocated_height(widget));
+    cairo_fill(cr);
+
+    return FALSE;  
+}
+void recommencerApplication(GtkWidget *widget, gpointer data) {
+    
+    GList *children, *iter;
+    children = gtk_container_get_children(GTK_CONTAINER(vbox));
+    for (iter = children; iter != NULL; iter = g_list_next(iter)) {
+        gtk_widget_destroy(GTK_WIDGET(iter->data));  // Détruire chaque enfant
+    }
+    g_list_free(children);
+
+    
+    taille = 0;
+    currentCase = 0;
+
+   
+    GtkWidget *label = gtk_label_new("Entrez la taille du tableau :");
+    GtkWidget *entry = gtk_entry_new();
+    gtk_container_add(GTK_CONTAINER(vbox), label);
+    gtk_container_add(GTK_CONTAINER(vbox), entry);
+
+    GtkWidget *buttonRemplir = gtk_button_new_with_label("Remplir le tableau");
+    g_signal_connect(G_OBJECT(buttonRemplir), "clicked", G_CALLBACK(remplirTableau), entry);
+    gtk_container_add(GTK_CONTAINER(vbox), buttonRemplir);
+
+    GtkWidget *quitBtn = gtk_button_new_with_label("Quitter");
+    gtk_container_add(GTK_CONTAINER(vbox), quitBtn);  
+    g_signal_connect(G_OBJECT(quitBtn), "clicked", G_CALLBACK(gtk_main_quit), NULL);
+
+    labelStatus = gtk_label_new("");
+    gtk_container_add(GTK_CONTAINER(vbox), labelStatus);
+    provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider,
+        "window { background-color: #EEE; }"
+        "button, .button { border-radius: 8px; padding: 10px; background: #AED581; color: #FFF; }"
+        "button:hover, .button:hover { background: #81C784; cursor : pointer; }", -1, NULL);
+    application_css(GTK_WIDGET(window), GTK_STYLE_PROVIDER(provider));
+    
+    gtk_widget_show_all(window);
+}
+gboolean fadeInLabel(gpointer label_ptr) {
+    static const double MAX_OPACITY = 1.0;
+    static const double OPACITY_INCREMENT = 0.1;
+    
+    GtkWidget *label = GTK_WIDGET(label_ptr);
+    double opacity = gtk_widget_get_opacity(label);
+    
+    if (opacity < MAX_OPACITY) {
+        opacity += OPACITY_INCREMENT;
+        gtk_widget_set_opacity(label, opacity);
+        return TRUE; 
+    }
+    
+    return FALSE; 
+}
+//chercher sur internet
+gboolean transitionColor(gpointer label_ptr) {
+    const double TARGET_RED = 129.0 / 255.0;
+    const double TARGET_GREEN = 199.0 / 255.0;
+    const double TARGET_BLUE = 132.0 / 255.0;
+    static const double COLOR_INCREMENT = 0.1;
+
+    GtkWidget *label = GTK_WIDGET(label_ptr);
+    GdkRGBA *color = g_object_get_data(G_OBJECT(label), "custom-bg-color");
+
+    if (!color) {
+
+        color = g_new(GdkRGBA, 1);
+        gdk_rgba_parse(color, "#81C784");  
+        g_object_set_data_full(G_OBJECT(label), "custom-bg-color", color, (GDestroyNotify)gdk_rgba_free);
+    }
+
+    gboolean color_changed = FALSE;
+
+
+    #ifndef MIN
+    #define MIN(a, b) ((a) < (b) ? (a) : (b))
+    #endif
+
+    if (color->red < TARGET_RED) {
+        color->red = MIN(color->red + COLOR_INCREMENT, TARGET_RED);
+        color_changed = TRUE;
+    }
+
+    if (color->green < TARGET_GREEN) {
+        color->green = MIN(color->green + COLOR_INCREMENT, TARGET_GREEN);
+        color_changed = TRUE;
+    }
+
+    if (color->blue < TARGET_BLUE) {
+        color->blue = MIN(color->blue + COLOR_INCREMENT, TARGET_BLUE);
+        color_changed = TRUE;
+    }
+
+    if (color_changed) {
+        gtk_widget_queue_draw(label); 
+        return TRUE;  
+    }
+
+    return FALSE;  
 }

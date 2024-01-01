@@ -1,5 +1,4 @@
 #include <gtk/gtk.h>
-#include <pango/pango.h>
 #include <stdio.h>
 #include <stdlib.h>
 // declaration globale psq utilisithm un peu partout dans le code
@@ -14,7 +13,7 @@ GtkCssProvider *provider; // bch n9dr nst3ml css
 int taille = 0;
 int tableau[MAX_TAILLE];
 int currentCase=0;
-// GtkWidget **arrayLabels = NULL;
+
 
 //fonction li tajouti la valeur
 void ajoutervaleur(GtkWidget *widget , gpointer data);
@@ -128,23 +127,24 @@ if (currentCase < taille ) {
         gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
         g_signal_connect(G_OBJECT(box), "draw", G_CALLBACK(draw_background), NULL);
 
-        int cell_size = 60;
+        int cell_size = 65;
         gtk_widget_set_size_request(box, cell_size, cell_size);
 
         GtkWidget *frame = gtk_frame_new(NULL);
         gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
         gtk_container_add(GTK_CONTAINER(frame), box);
         g_signal_connect(G_OBJECT(frame), "draw", G_CALLBACK(draw_background), NULL);
-        gtk_grid_attach(GTK_GRID(grid), frame, currentCase % 5, currentCase / 5, 1, 1);
+        gtk_grid_attach(GTK_GRID(grid), frame, currentCase % 10, currentCase / 10, 1, 1);
 
         gtk_widget_show_all(window);
 
         
         currentCase++;
 
-        if (currentCase < taille) {
-        //n3yt lel la meme fonction avec un delai 
-        g_timeout_add(1500, (GSourceFunc)afficherCase, NULL);}
+    }
+    else
+    {
+        return;
     }
 }
 
@@ -160,8 +160,8 @@ void afficherTableau(const int *tableau, int taille) {
     g_list_free(children);
 
     grid = gtk_grid_new();
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 10);
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 1);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 20);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 0);
     gtk_widget_set_halign(grid, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(grid, GTK_ALIGN_CENTER);
     gtk_container_add(GTK_CONTAINER(vbox),grid);
@@ -174,7 +174,7 @@ void afficherTableau(const int *tableau, int taille) {
     GtkWidget *buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_set_homogeneous(GTK_BOX(buttonBox), TRUE); 
     // dok n3yt lel fonction bch taffichili case par case
-    afficherCase();
+    g_timeout_add(1000, (GSourceFunc)afficherCase, NULL);
     //nnzid le button tae ajouter valeur w nconnectih mea el fonction 
     GtkWidget *addbtn= gtk_button_new_with_label("Ajouter une valeur au Tableau");
     g_signal_connect(G_OBJECT(addbtn), "clicked", G_CALLBACK(ajoutervaleur), NULL);

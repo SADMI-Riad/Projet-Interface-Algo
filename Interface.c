@@ -36,7 +36,7 @@ void application_css(GtkWidget *widget,GtkStyleProvider *provider);
 // bch n'ameliori encore plus
 gboolean transitionColor(gpointer box_ptr);
 gboolean fadeInLabel(gpointer label_ptr);
-
+void show_alert(const char *message);
 void recommencerApplication(GtkWidget *widget, gpointer data);
 
 //nsgm el bug de compilation
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Simulation Tri par Insertion tableau");
-    gtk_window_set_default_size(GTK_WINDOW(window), 700, 500);
+    gtk_window_set_default_size(GTK_WINDOW(window), 1000, 500);
     gtk_container_set_border_width(GTK_CONTAINER(window), 15);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -91,7 +91,7 @@ void remplirTableau(GtkWidget *widget, gpointer data) {
     taille = atoi(text);
 
     if (taille <= 0 || taille> MAX_TAILLE) {
-        printf("Erreur: la taille du tableau doit être un entier strictement positif.\n");
+        show_alert("Erreur: la taille du tableau doit être un entier strictement positif.\n");
         return;
     }
 
@@ -133,7 +133,7 @@ if (currentCase < taille ) {
         gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
         g_signal_connect(G_OBJECT(box), "draw", G_CALLBACK(draw_background), NULL);
 
-        int cell_size = 65;
+        int cell_size = 75;
         gtk_widget_set_size_request(box, cell_size, cell_size);
         labels[currentCase] = label;
         GtkWidget *frame = gtk_frame_new(NULL);

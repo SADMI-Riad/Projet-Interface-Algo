@@ -135,7 +135,7 @@ if (currentCase < taille ) {
 
         int cell_size = 65;
         gtk_widget_set_size_request(box, cell_size, cell_size);
-
+        labels[currentCase] = label;
         GtkWidget *frame = gtk_frame_new(NULL);
         gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
         gtk_container_add(GTK_CONTAINER(frame), box);

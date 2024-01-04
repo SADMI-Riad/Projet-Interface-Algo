@@ -4,7 +4,7 @@
 // declaration globale psq utilisithm un peu partout dans le code
 #define MAX_TAILLE 200
 
-
+GtkWidget *labels[MAX_TAILLE];
 GtkWidget *window;
 GtkWidget *vbox;
 GtkWidget *grid;

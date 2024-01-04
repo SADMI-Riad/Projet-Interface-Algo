@@ -14,6 +14,8 @@ int taille = 0;
 int tableau[MAX_TAILLE];
 int currentCase=0;
 
+
+void supprimerValeurOuPositionInterface(GtkWidget *widget, gpointer data);
 void supprimerValeurOuPosition(int mode, int value) ;
 //fonction li tajouti la valeur
 void ajoutervaleur(GtkWidget *widget , gpointer data);
@@ -187,7 +189,10 @@ void afficherTableau(const int *tableau, int taille) {
     GtkWidget *buttonRecommencer = gtk_button_new_with_label("Recommencer");
     g_signal_connect(G_OBJECT(buttonRecommencer), "clicked", G_CALLBACK(recommencerApplication), NULL);
     gtk_box_pack_start(GTK_BOX(buttonBox), buttonRecommencer, TRUE, TRUE, 0);
-
+    //sup btn
+    GtkWidget *supbtn = gtk_button_new_with_label("supprimer valeur");
+    gtk_container_add(GTK_CONTAINER(buttonBox), supbtn);  
+    g_signal_connect(G_OBJECT(supbtn), "clicked",G_CALLBACK(supprimerValeurOuPositionInterface), NULL);
     //css the btn
     provider=gtk_css_provider_new();
     gtk_css_provider_load_from_data(provider,
@@ -403,4 +408,38 @@ void supprimerValeurOuPosition(int mode, int value) {
     }
 
     afficherTableau(tableau, taille);
+}
+
+void supprimerValeurOuPositionInterface(GtkWidget *widget, gpointer data) {
+    GtkWidget *dialog, *content_area, *modeComboBox, *valueEntry;
+    GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+
+    dialog = gtk_dialog_new_with_buttons("Supprimer valeur ou position", GTK_WINDOW(window),
+                                         flags, "_OK", GTK_RESPONSE_OK,
+                                         "_Cancel", GTK_RESPONSE_CANCEL, NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+    
+    modeComboBox = gtk_combo_box_text_new();
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(modeComboBox), "Position");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(modeComboBox), "Valeur");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(modeComboBox), 0);  
+    gtk_container_add(GTK_CONTAINER(content_area), modeComboBox);
+
+    
+    valueEntry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(valueEntry), "Entrez la valeur ou la position");
+    gtk_container_add(GTK_CONTAINER(content_area), valueEntry);
+
+    gtk_widget_show_all(dialog);
+    gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+
+    if (result == GTK_RESPONSE_OK) {
+        int mode = gtk_combo_box_get_active(GTK_COMBO_BOX(modeComboBox));
+        const char *valueText = gtk_entry_get_text(GTK_ENTRY(valueEntry));
+        int value = atoi(valueText);
+        supprimerValeurOuPosition(mode, value);
+    }
+
+    gtk_widget_destroy(dialog);
 }

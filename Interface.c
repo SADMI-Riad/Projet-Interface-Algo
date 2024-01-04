@@ -14,7 +14,7 @@ int taille = 0;
 int tableau[MAX_TAILLE];
 int currentCase=0;
 
-
+void supprimerValeurOuPosition(int mode, int value) ;
 //fonction li tajouti la valeur
 void ajoutervaleur(GtkWidget *widget , gpointer data);
 // hadi bch yaffichiw gae les cases fiha appel lel fonction li rahi ththa
@@ -367,4 +367,40 @@ gboolean transitionColor(gpointer label_ptr) {
     }
 
     return FALSE;  
+}
+
+void show_alert(const char *message) {
+    GtkWidget *dialog = gtk_message_dialog_new(NULL,GTK_DIALOG_MODAL,GTK_MESSAGE_WARNING,GTK_BUTTONS_OK,"%s",message);
+
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
+void supprimerValeurOuPosition(int mode, int value) {
+    if (taille <= 0) {
+        g_print("Le tableau est déjà vide!\n");
+        return;
+    }
+
+    if (mode == 0) {
+        if (value < 0 || value >= taille) {
+            g_print("Position invalide!\n");
+            return;
+        }
+        for (int i = value; i < taille - 1; i++) {
+            tableau[i] = tableau[i + 1];
+        }
+    } else if (mode == 1) {
+        int found = 0; 
+        for (int i = 0; i < taille; i++) {
+            if (tableau[i] == value) {
+                found++;
+            } else {
+                tableau[i - found] = tableau[i]; 
+            }
+        }
+        taille -= found; 
+    }
+
+    afficherTableau(tableau, taille);
 }

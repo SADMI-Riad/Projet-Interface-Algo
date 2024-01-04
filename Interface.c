@@ -14,6 +14,10 @@ int taille = 0;
 int tableau[MAX_TAILLE];
 int currentCase=0;
 
+gboolean effectuerUnePermutationcrois(gpointer data) ;
+gboolean effectuerUnePermutationdecrois(gpointer data);
+void commencerTri(GtkWidget *widget, gpointer data) ;
+void changerCouleurFond(GtkWidget *label, const char *couleur);
 
 void supprimerValeurOuPositionInterface(GtkWidget *widget, gpointer data);
 void supprimerValeurOuPosition(int mode, int value) ;
@@ -193,6 +197,10 @@ void afficherTableau(const int *tableau, int taille) {
     GtkWidget *supbtn = gtk_button_new_with_label("supprimer valeur");
     gtk_container_add(GTK_CONTAINER(buttonBox), supbtn);  
     g_signal_connect(G_OBJECT(supbtn), "clicked",G_CALLBACK(supprimerValeurOuPositionInterface), NULL);
+    //tri btn
+    GtkWidget *sortBtn = gtk_button_new_with_label("Trier le tableau");
+    g_signal_connect(G_OBJECT(sortBtn), "clicked", G_CALLBACK(commencerTri), NULL);
+    gtk_container_add(GTK_CONTAINER(buttonBox), sortBtn);
     //css the btn
     provider=gtk_css_provider_new();
     gtk_css_provider_load_from_data(provider,
@@ -442,4 +450,149 @@ void supprimerValeurOuPositionInterface(GtkWidget *widget, gpointer data) {
     }
 
     gtk_widget_destroy(dialog);
+}
+
+gboolean effectuerUnePermutationcrois(gpointer data) {
+    static int i = 1, j = 0, phase = 0;
+
+    if (i <= taille) {
+        if (phase == 0) {
+            
+            if (j < 0 || tableau[j] <= tableau[j + 1]) {
+                j = i - 1; 
+                i++;       
+            }
+
+            if (j >= 0 && j<taille-1 && tableau[j] > tableau[j + 1]) {
+                
+                changerCouleurFond(labels[j], "#FFA07A");   
+                changerCouleurFond(labels[j + 1], "#FFA07A"); 
+
+                phase = 1; 
+                g_timeout_add(500, effectuerUnePermutationcrois, NULL);
+                return G_SOURCE_REMOVE; 
+            }
+        } else {
+           
+            int temp = tableau[j];
+            tableau[j] = tableau[j + 1];
+            tableau[j + 1] = temp;
+
+            
+            gchar *text = g_strdup_printf("%d", tableau[j]);
+            gtk_label_set_text(GTK_LABEL(labels[j]), text);
+            g_free(text);
+
+            text = g_strdup_printf("%d", tableau[j + 1]);
+            gtk_label_set_text(GTK_LABEL(labels[j + 1]), text);
+            g_free(text);
+
+            
+            changerCouleurFond(labels[j], "#FFFFFF");  
+            changerCouleurFond(labels[j + 1], "#FFFFFF"); 
+
+            phase = 0; 
+            j--; 
+        }
+    } else {
+        
+        gtk_label_set_text(GTK_LABEL(labelStatus), "Tri terminé!");
+    for (int i = 0; i < taille; i++)
+    {
+        changerCouleurFond(labels[i], "#81C784");
+    }
+        i = 1; 
+        j = 0; 
+        phase = 0; 
+        return G_SOURCE_REMOVE; 
+    }
+    
+    return G_SOURCE_CONTINUE; 
+    
+}
+gboolean effectuerUnePermutationdecrois(gpointer data) {
+    static int i = 1, j = 0, phase = 0;
+
+    if (i <= taille) {
+        if (phase == 0) {
+            
+            if (j < 0 || tableau[j] >= tableau[j + 1]) { 
+                j = i - 1; 
+                i++;       
+            }
+
+            if (j >= 0 && j < taille - 1 && tableau[j] < tableau[j + 1]) { 
+                
+                changerCouleurFond(labels[j], "#FFA07A");   
+                changerCouleurFond(labels[j + 1], "#FFA07A"); 
+
+                phase = 1; 
+                g_timeout_add(500, effectuerUnePermutationdecrois, NULL);
+                return G_SOURCE_REMOVE; 
+            }
+        } else {
+           
+            int temp = tableau[j];
+            tableau[j] = tableau[j + 1];
+            tableau[j + 1] = temp;
+
+            
+            gchar *text = g_strdup_printf("%d", tableau[j]);
+            gtk_label_set_text(GTK_LABEL(labels[j]), text);
+            g_free(text);
+
+            text = g_strdup_printf("%d", tableau[j + 1]);
+            gtk_label_set_text(GTK_LABEL(labels[j + 1]), text);
+            g_free(text);
+
+            
+            changerCouleurFond(labels[j], "#FFFFFF");  
+            changerCouleurFond(labels[j + 1], "#FFFFFF"); 
+
+            phase = 0; 
+            j--; 
+        }
+    } else {
+        
+        gtk_label_set_text(GTK_LABEL(labelStatus), "Tri terminé!");
+        for (int i = 0; i < taille; i++)
+        {
+            changerCouleurFond(labels[i], "#81C784");
+        }
+        i = 1; 
+        j = 0; 
+        phase = 0; 
+        return G_SOURCE_REMOVE; 
+    }
+    
+    return G_SOURCE_CONTINUE; 
+    
+}
+void changerCouleurFond(GtkWidget *label, const char *couleur) {
+    
+    gchar *css = g_strdup_printf("label {background-color: %s;}", couleur);
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, css, -1, NULL);
+    gtk_style_context_add_provider(gtk_widget_get_style_context(label),
+                                   GTK_STYLE_PROVIDER(provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_USER);
+    g_free(css);
+}
+void commencerTri(GtkWidget *widget, gpointer data) {
+
+    GtkWidget *dialog = gtk_dialog_new_with_buttons("Choix du Tri",
+                                                    GTK_WINDOW(data),
+                                                    GTK_DIALOG_MODAL,
+                                                    "Tri Croissant",
+                                                    GTK_RESPONSE_ACCEPT,
+                                                    "Tri Décroissant",
+                                                    GTK_RESPONSE_REJECT,
+                                                    NULL);
+    gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    if (result == GTK_RESPONSE_ACCEPT) {
+        g_timeout_add(1000, (GSourceFunc)effectuerUnePermutationcrois, NULL);
+    } else if (result == GTK_RESPONSE_REJECT) {
+        g_timeout_add(1000, (GSourceFunc)effectuerUnePermutationdecrois, NULL);
+    }
 }

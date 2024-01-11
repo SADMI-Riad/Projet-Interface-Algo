@@ -391,13 +391,13 @@ void show_alert(const char *message) {
 
 void supprimerValeurOuPosition(int mode, int value) {
     if (taille <= 0) {
-        g_print("Le tableau est déjà vide!\n");
+        show_alert("Le tableau est déjà vide!\n");
         return;
     }
 
     if (mode == 0) {
         if (value < 0 || value >= taille) {
-            g_print("Position invalide!\n");
+            show_alert("Position invalide!\n");
             return;
         }
         for (int i = value; i < taille - 1; i++) {

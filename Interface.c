@@ -38,7 +38,6 @@ gboolean transitionColor(gpointer box_ptr);
 gboolean fadeInLabel(gpointer label_ptr);
 void show_alert(const char *message);
 void recommencerApplication(GtkWidget *widget, gpointer data);
-
 //nsgm el bug de compilation
 static gboolean draw_background(GtkWidget *widget, cairo_t *cr, gpointer data);
 
@@ -75,7 +74,7 @@ int main(int argc, char *argv[])
     gtk_css_provider_load_from_data(provider,
         "window { background-color: #EEE; }"  
         "button, .button { border-radius: 8px; padding: 10px; background: #AED581; color: #FFF; }"
-        "button:hover, .button:hover { background: #81C784; cursor:pointer;}", -1, NULL);
+        "button:hover, .button:hover { background: #81C784; }", -1, NULL);
     application_css(GTK_WIDGET(window), GTK_STYLE_PROVIDER(provider)); 
 
     gtk_widget_show_all(window);
@@ -206,7 +205,7 @@ void afficherTableau(const int *tableau, int taille) {
     gtk_css_provider_load_from_data(provider,
     "window { background-color: #EEE; }"  
     "button, .button { border-radius: 8px; padding: 10px; background: #AED581; color: #FFF; }"
-    "button:hover, .button:hover { background: #81C784; cursor:pointer;}", -1, NULL);
+    "button:hover, .button:hover { background: #81C784; }", -1, NULL);
     
     application_css(GTK_WIDGET(buttonBox), GTK_STYLE_PROVIDER(provider)); 
 
@@ -236,9 +235,9 @@ void ajoutervaleur(GtkWidget *widget , gpointer data)
         gtk_label_set_text(GTK_LABEL(labelStatus),"Le tableau est plein!");
         return;
     }
-GtkWidget *dialog,*valeurEntry,*positionEntry,*content_area;
-dialog=gtk_dialog_new_with_buttons("Ajouter une valeur",GTK_WINDOW(window),GTK_DIALOG_MODAL,"_OK",GTK_RESPONSE_OK,"_Retour",GTK_RESPONSE_CANCEL,NULL);
-content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    GtkWidget *dialog,*valeurEntry,*positionEntry,*content_area;
+    dialog=gtk_dialog_new_with_buttons("Ajouter une valeur",GTK_WINDOW(window),GTK_DIALOG_MODAL,"_OK",GTK_RESPONSE_OK,"_Retour",GTK_RESPONSE_CANCEL,NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     valeurEntry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(valeurEntry), "Valeur à ajouter");
     gtk_container_add(GTK_CONTAINER(content_area), valeurEntry);
@@ -253,7 +252,7 @@ content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
         int valeur = atoi(valeurText);
         int position = atoi(positionText);
         if (position < 0 || position > taille) {
-            gtk_label_set_text(GTK_LABEL(labelStatus), "Position invalide!");
+            show_alert("Position invalide !");
         } else {
             for (int i = taille; i > position; --i) {
                 tableau[i] = tableau[i - 1];
@@ -335,52 +334,23 @@ gboolean fadeInLabel(gpointer label_ptr) {
     
     return FALSE; 
 }
-//chercher sur internet
+//modifier en utlisons le css psq lwla etait un peut complexe
 gboolean transitionColor(gpointer label_ptr) {
-    const double TARGET_RED = 129.0 / 255.0;
-    const double TARGET_GREEN = 199.0 / 255.0;
-    const double TARGET_BLUE = 132.0 / 255.0;
-    static const double COLOR_INCREMENT = 0.1;
+    const char *TARGET_COLOR = "#81C784";  // Couleur cible en hexadécimal
+    const char *TRANSITION_CSS = "label { transition: background-color 1s; background-color: %s; }";
 
     GtkWidget *label = GTK_WIDGET(label_ptr);
-    GdkRGBA *color = g_object_get_data(G_OBJECT(label), "custom-bg-color");
+    GtkCssProvider *css_provider = gtk_css_provider_new();
+    gchar *css = g_strdup_printf(TRANSITION_CSS, TARGET_COLOR);
 
-    if (!color) {
-
-        color = g_new(GdkRGBA, 1);
-        gdk_rgba_parse(color, "#81C784");  
-        g_object_set_data_full(G_OBJECT(label), "custom-bg-color", color, (GDestroyNotify)gdk_rgba_free);
-    }
-
-    gboolean color_changed = FALSE;
-
-
-    #ifndef MIN
-    #define MIN(a, b) ((a) < (b) ? (a) : (b))
-    #endif
-
-    if (color->red < TARGET_RED) {
-        color->red = MIN(color->red + COLOR_INCREMENT, TARGET_RED);
-        color_changed = TRUE;
-    }
-
-    if (color->green < TARGET_GREEN) {
-        color->green = MIN(color->green + COLOR_INCREMENT, TARGET_GREEN);
-        color_changed = TRUE;
-    }
-
-    if (color->blue < TARGET_BLUE) {
-        color->blue = MIN(color->blue + COLOR_INCREMENT, TARGET_BLUE);
-        color_changed = TRUE;
-    }
-
-    if (color_changed) {
-        gtk_widget_queue_draw(label); 
-        return TRUE;  
-    }
+    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    gtk_style_context_add_provider(gtk_widget_get_style_context(label), GTK_STYLE_PROVIDER(css_provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+    g_object_unref(css_provider);
+    g_free(css);
 
     return FALSE;  
 }
+
 
 void show_alert(const char *message) {
     GtkWidget *dialog = gtk_message_dialog_new(NULL,GTK_DIALOG_MODAL,GTK_MESSAGE_WARNING,GTK_BUTTONS_OK,"%s",message);
